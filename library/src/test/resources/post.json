@@ -1,0 +1,42 @@
+{
+    "title": "Hello",
+    "message": "Lorem ipsum",
+    "_links": {
+        "self": {
+            "href": "http://localhost:3000/posts/1",
+            "templated": false
+        },
+        "doc:edit-form": {
+            "href": "/posts/1/edit",
+            "templated": false
+        },
+        "doc:delete": {
+            "href": "/posts/1",
+            "templated": false
+        },
+        "posts": {
+            "href": "/posts/1/posts",
+            "templated": false
+        }
+    },
+    "_embedded": {
+        "comments": [
+            {
+                "comment": "whoho",
+                "_links": { 
+                    "self": {
+                        "href": "/comments/5"
+                    }
+                }
+            },
+            {
+                "comment": "dolor sit",
+                "_links": { 
+                    "self": {
+                        "href": "/comments/2"
+                    }
+                }
+            }
+        ]
+    }
+}

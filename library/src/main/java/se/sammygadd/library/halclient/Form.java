@@ -12,10 +12,6 @@ public class Form extends Resource {
 
     private final String DEFAULT_SUBMIT_TEXT = "save";
 
-    public interface OnSubmitListener {
-        void onSubmit();
-    }
-
     class Field {
         public final static int STRING  = 1;
         public final static int INTEGER = 2;
@@ -81,17 +77,10 @@ public class Form extends Resource {
         }
     }
 
-    private OnSubmitListener mSubmitListener;
-
     private List<Field> mFields;
 
     public Form(JSONObject json) {
         super(json);
-    }
-
-    public Form(JSONObject json, OnSubmitListener listener) {
-        this(json);
-        setOnSubmitListener(listener);
     }
 
     public String getName() {
@@ -149,17 +138,5 @@ public class Form extends Resource {
             }
         }
         return mFields;
-    }
-
-    public void setOnSubmitListener(OnSubmitListener listener) {
-        mSubmitListener = listener;
-    }
-
-    public boolean submit() {
-        if (mSubmitListener == null) {
-            return false;
-        }
-        mSubmitListener.onSubmit();
-        return true;
     }
 }
