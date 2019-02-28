@@ -23,7 +23,7 @@
         "comments": [
             {
                 "comment": "whoho",
-                "_links": { 
+                "_links": {
                     "self": {
                         "href": "/comments/5"
                     }
@@ -31,7 +31,7 @@
             },
             {
                 "comment": "dolor sit",
-                "_links": { 
+                "_links": {
                     "self": {
                         "href": "/comments/2"
                     }

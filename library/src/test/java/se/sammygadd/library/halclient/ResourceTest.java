@@ -6,11 +6,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -18,15 +19,8 @@ import static org.junit.Assert.*;
 public class ResourceTest {
 
     private String getTestResource(String name) {
-        // FIXME: How to put resources on the classpath and skip this ugly workaround????
-        String path = getClass().getResource(".").getPath();
-        name = path + name;
-        System.out.println("File: " + name);
-        InputStream is = getClass().getResourceAsStream(name);
-        if (is == null ) {
-            System.out.println("InputStream is null");
-            return "";
-        }
+        InputStream is = getClass().getClassLoader().getResourceAsStream(name);
+        if (is == null ) return null;
         return new BufferedReader(new InputStreamReader(is))
                 .lines().collect(Collectors.joining("\n"));
     }
@@ -34,44 +28,67 @@ public class ResourceTest {
     Resource post;
 
     @Before
-    public void setup() throws JSONException {
+    public void setup() {
         String str = getTestResource("post.json");
-        System.out.println("Str: " + str);
-        JSONObject json = new JSONObject(str);
-        post = new Resource(json);
+        assertNotNull("Failed to load test resource \"post.json\"", str);
+        try {
+            post = new Resource(new JSONObject(str));
+        } catch (JSONException e) {
+            System.out.println("Caught json exception: " + e.getMessage());
+        }
+        assertNotNull("Could not parse test resource \"post.json\"", post);
     }
 
     @Test
     public void resource_contructor() throws JSONException {
-        assertEquals("hello", post.getAttribute("title"));
-        assertEquals("Lorem ipsum", post.getAttribute("message"));
+        assertNotNull(post.toString());
     }
 
     @Test
     public void getAttributes() {
+        HashMap<String, String> attributes = post.getAttributes();
+        assertEquals(2, attributes.size());
     }
 
     @Test
     public void getLinks() {
+        HashMap<String, String> links = post.getLinks();
+        assertEquals(4, links.size());
     }
 
     @Test
     public void getAttribute() {
-    }
-
-    @Test
-    public void getAttribute1() {
+        assertEquals("Hello", post.getAttribute("title"));
+        assertEquals("Lorem ipsum", post.getAttribute("message"));
     }
 
     @Test
     public void getLinkHref() {
+        assertEquals("http://localhost:3000/posts/1", post.getLinkHref("self"));
+        assertEquals("/posts/1/edit", post.getLinkHref("doc:edit-form"));
+        assertEquals("/posts/1", post.getLinkHref("doc:delete"));
+        assertEquals("/posts/1/posts", post.getLinkHref("posts"));
     }
 
     @Test
     public void resource_toString() {
+        String json = post.toString();
+        assertNotNull(json);
+        assertTrue(json.length() > 20);
+        assertTrue(json.contains("_links"));
     }
 
     @Test
     public void actions() {
+        Set<String> actions = post.actions();
+        assertEquals(4, actions.size());
+
+        Collection<String> expected = new ArrayList<String>();
+        expected.add("self");
+        expected.add("doc:edit-form");
+        expected.add("doc:delete");
+        expected.add("posts");
+
+        assertTrue(actions.containsAll(expected));
     }
 }
