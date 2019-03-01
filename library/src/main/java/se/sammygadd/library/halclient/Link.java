@@ -16,7 +16,7 @@ public class Link {
 
     public void parse(JSONObject json) {
         mHref = json.optString("href");
-        mTitle = json.optString("title");
+        mTitle = json.optString("title", mRel);
         mName = json.optString("name");
         mTemplated = json.optBoolean("templated");
     }

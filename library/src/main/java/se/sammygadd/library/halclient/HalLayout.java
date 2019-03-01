@@ -56,9 +56,8 @@ public class HalLayout extends LinearLayout {
 
         for (String rel : map.keySet()) {
             if (rel.equals("self")) continue;
-            String href = mResource.getLink(rel).href();
-            // String title = mResource.getLinkTitle(rel, value);
-            addButton(rel, href);
+            Link link = mResource.getLink(rel);
+            addButton(link.title(), link.href());
         }
     }
 
