@@ -28,6 +28,15 @@
           ]
     },
     "_embedded": {
+        "author" : {
+            "name": "Bob",
+            "_links": {
+                "self": {
+                    "href": "/users/5"
+                }
+            }
+
+        },
         "comments": [
             {
                 "comment": "whoho",

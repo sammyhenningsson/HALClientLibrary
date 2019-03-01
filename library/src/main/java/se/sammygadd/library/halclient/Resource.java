@@ -6,8 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class Resource {
@@ -15,7 +17,7 @@ public class Resource {
     HashMap<String,String> mAttributes;
     HashMap<String, Link> mLinks;
     HashMap<String, Curie> mCuries;
-    // HashMap<String,Resource> mEmbedded;
+    HashMap<String, List<Resource>> mEmbedded;
 
     public Resource(JSONObject json) {
         mJSON = json;
@@ -75,11 +77,45 @@ public class Resource {
 
         }
     }
+
     public HashMap<String, Curie> getCuries() {
         if (mCuries == null) {
             getLinks();
         }
         return mCuries;
+    }
+
+    public HashMap<String, List<Resource>> getEmbedded() {
+        if (mEmbedded == null) {
+            mEmbedded = new HashMap<String, List<Resource>>();
+            try {
+                JSONObject embedded = mJSON.getJSONObject("_embedded");
+                Iterator<String> keys = embedded.keys();
+                while (keys.hasNext()) {
+                    String rel = keys.next();
+                    List<Resource> list = new ArrayList<>();
+                    JSONObject jsonObject = embedded.optJSONObject(rel);
+                    if (jsonObject != null) {
+                        list.add(new Resource(jsonObject));
+                        mEmbedded.put(rel, list);
+                        continue;
+                    }
+                    JSONArray jsonArray = embedded.optJSONArray(rel);
+                    if (jsonArray != null) {
+                        for (int i = 0; i < jsonArray.length(); ++i) {
+                            JSONObject json = jsonArray.getJSONObject(i);
+                            list.add(new Resource(json));
+                        }
+                        mEmbedded.put(rel, list);
+                        continue;
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(Constants.TAG, "Failed to parse embedded resources: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return mEmbedded;
     }
 
     public String getAttribute(String name) {
@@ -99,6 +135,13 @@ public class Resource {
 
     public Curie getCurie(String rel) {
         return getCuries().get(rel);
+    }
+
+    public List<Resource> getEmbedded(String name) {
+        if (getEmbedded().containsKey(name)) {
+            return mEmbedded.get(name);
+        }
+        return new ArrayList<Resource>();
     }
 
     public String toString() {

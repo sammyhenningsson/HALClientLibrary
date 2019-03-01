@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,6 +79,25 @@ public class ResourceTest {
         assertEquals("/doc/post/rels/{rel}", curie.href());
         assertEquals(true, curie.isTemplated());
         assertEquals("/doc/post/rels/comments", curie.resolve("comments"));
+    }
+
+    @Test
+    public void getEmbeddedResources() {
+        List<Resource> authors = post.getEmbedded("author");
+        assertEquals(1, authors.size());
+        Resource author = authors.get(0);
+        assertEquals("Bob", author.getAttribute("name"));
+        assertEquals("/users/5", author.getLink("self").href());
+
+        List<Resource> comments = post.getEmbedded("comments");
+        assertEquals(2, comments.size());
+        Resource comment1 = comments.get(0);
+        assertEquals("whoho", comment1.getAttribute("comment"));
+        assertEquals("/comments/5", comment1.getLink("self").href());
+
+        Resource comment2 = comments.get(1);
+        assertEquals("dolor sit", comment2.getAttribute("comment"));
+        assertEquals("/comments/2", comment2.getLink("self").href());
     }
 
     @Test
