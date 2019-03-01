@@ -52,7 +52,7 @@ public class ResourceTest {
 
     @Test
     public void getLinks() {
-        HashMap<String, String> links = post.getLinks();
+        HashMap<String, Link> links = post.getLinks();
         assertEquals(4, links.size());
     }
 
@@ -63,11 +63,21 @@ public class ResourceTest {
     }
 
     @Test
-    public void getLinkHref() {
-        assertEquals("http://localhost:3000/posts/1", post.getLinkHref("self"));
-        assertEquals("/posts/1/edit", post.getLinkHref("doc:edit-form"));
-        assertEquals("/posts/1", post.getLinkHref("doc:delete"));
-        assertEquals("/posts/1/posts", post.getLinkHref("posts"));
+    public void link_hrefs() {
+        assertEquals("http://localhost:3000/posts/1", post.getLink("self").href());
+        assertEquals("/posts/1/edit", post.getLink("doc:edit-form").href());
+        assertEquals("/posts/1", post.getLink("doc:delete").href());
+        assertEquals("/posts/1/comments", post.getLink("comments").href());
+    }
+
+    @Test
+    public void getCurie() {
+        Curie curie = post.getCurie("doc");
+        assertNotNull(curie);
+        assertEquals("doc", curie.name());
+        assertEquals("/doc/post/rels/{rel}", curie.href());
+        assertEquals(true, curie.isTemplated());
+        assertEquals("/doc/post/rels/comments", curie.resolve("comments"));
     }
 
     @Test
@@ -87,7 +97,7 @@ public class ResourceTest {
         expected.add("self");
         expected.add("doc:edit-form");
         expected.add("doc:delete");
-        expected.add("posts");
+        expected.add("comments");
 
         assertTrue(actions.containsAll(expected));
     }

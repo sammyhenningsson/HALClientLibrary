@@ -140,7 +140,7 @@ public class ResourceRepository {
     }
 
     public void store(Resource resource, Header[] headers) {
-        String href = resource.getLinkHref("self");
+        String href = resource.getLink("self").href();
         mStorage.put(href, resource);
     }
 }

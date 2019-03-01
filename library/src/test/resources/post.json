@@ -14,10 +14,18 @@
             "href": "/posts/1",
             "templated": false
         },
-        "posts": {
-            "href": "/posts/1/posts",
-            "templated": false
-        }
+        "comments": {
+            "href": "/posts/1/comments",
+            "templated": false,
+            "title": "kommentarer",
+        },
+        "curies": [
+            {
+              "name": "doc",
+              "href": "/doc/post/rels/{rel}",
+              "templated": true
+            }
+          ]
     },
     "_embedded": {
         "comments": [

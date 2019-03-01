@@ -52,13 +52,13 @@ public class HalLayout extends LinearLayout {
     }
 
     protected void addButtons() {
-        HashMap<String, String> map = mResource.getLinks();
+        HashMap<String, Link> map = mResource.getLinks();
 
         for (String rel : map.keySet()) {
             if (rel.equals("self")) continue;
-            String value = mResource.getLinkHref(rel);
+            String href = mResource.getLink(rel).href();
             // String title = mResource.getLinkTitle(rel, value);
-            addButton(rel, value);
+            addButton(rel, href);
         }
     }
 

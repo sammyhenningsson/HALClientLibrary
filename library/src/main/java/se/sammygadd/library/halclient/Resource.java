@@ -13,8 +13,8 @@ import java.util.Set;
 public class Resource {
     JSONObject mJSON;
     HashMap<String,String> mAttributes;
-    HashMap<String,String> mLinks;
-    HashMap<String,String> mCuries;
+    HashMap<String, Link> mLinks;
+    HashMap<String, Curie> mCuries;
     // HashMap<String,Resource> mEmbedded;
 
     public Resource(JSONObject json) {
@@ -39,7 +39,7 @@ public class Resource {
         return mAttributes;
     }
 
-    public HashMap<String, String> getLinks() {
+    public HashMap<String, Link> getLinks() {
         if (mLinks == null) {
             mLinks = new HashMap<>();
             try {
@@ -49,11 +49,10 @@ public class Resource {
                     String rel = keys.next();
                     if (rel.equals("curies")) {
                         parseCuries(links.getJSONArray(rel));
-                        continue;
+                    } else {
+                        Link link = new Link(rel, links.getJSONObject(rel));
+                        mLinks.put(rel, link);
                     }
-                    JSONObject link = links.getJSONObject(rel);
-                    String href = link.getString("href");
-                    mLinks.put(rel, href);
                 }
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "Failed to parse links: " + e.getMessage());
@@ -67,34 +66,20 @@ public class Resource {
         mCuries = new HashMap<>();
         for(int i = 0; i < curies.length(); ++i) {
             try {
-                JSONObject curie = curies.getJSONObject(i);
-                String name = curie.getString("name");
-                String href = curie.getString("href");
-                mCuries.put(name, href);
+                JSONObject json = curies.getJSONObject(i);
+                Curie curie = new Curie(json);
+                mCuries.put(curie.name(), curie);
             } catch (JSONException e) {
                 System.out.println("Failed to parse curie: " + curies.toString());
             }
 
         }
     }
-    public HashMap<String, String> getCuries() {
-        if (mLinks == null) {
-            mLinks = new HashMap<>();
-            try {
-                JSONObject links = mJSON.getJSONObject("_links");
-                Iterator<String> keys = links.keys();
-                while (keys.hasNext()) {
-                    String rel = keys.next();
-                    JSONObject link = links.getJSONObject(rel);
-                    String href = link.getString("href");
-                    mLinks.put(rel, href);
-                }
-            } catch (JSONException e) {
-                Log.e(Constants.TAG, "Failed to parse links: " + e.getMessage());
-                e.printStackTrace();
-            }
+    public HashMap<String, Curie> getCuries() {
+        if (mCuries == null) {
+            getLinks();
         }
-        return mLinks;
+        return mCuries;
     }
 
     public String getAttribute(String name) {
@@ -108,9 +93,12 @@ public class Resource {
         return value;
     }
 
-    public String getLinkHref(String rel) {
-        HashMap<String, String> links = getLinks();
-        return links.get(rel);
+    public Link getLink(String rel) {
+        return getLinks().get(rel);
+    }
+
+    public Curie getCurie(String rel) {
+        return getCuries().get(rel);
     }
 
     public String toString() {
