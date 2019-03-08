@@ -89,7 +89,9 @@ public class Resource {
         if (mEmbedded == null) {
             mEmbedded = new HashMap<String, List<Resource>>();
             try {
-                JSONObject embedded = mJSON.getJSONObject("_embedded");
+                JSONObject embedded = mJSON.optJSONObject("_embedded");
+                if (embedded == null) return mEmbedded;
+
                 Iterator<String> keys = embedded.keys();
                 while (keys.hasNext()) {
                     String rel = keys.next();

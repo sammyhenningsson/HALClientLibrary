@@ -1,5 +1,8 @@
 package se.sammygadd.library.halclient;
 
+import android.view.View;
+import android.widget.ScrollView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -9,7 +12,7 @@ public class HalContainer {
 
     private AppCompatActivity mActivity;
     private ResourceViewModel mViewModel;
-    private MutableLiveData<HalLayout> mLayout;
+    private MutableLiveData<View> mView;
     private OnNavigateToListener mOnNavigateToListener;
     private OnSubmitFormListener mOnSubmitFormListener;
 
@@ -24,7 +27,7 @@ public class HalContainer {
     public HalContainer(AppCompatActivity activity) {
         mActivity = activity;
         mViewModel = ViewModelProviders.of(activity).get(ResourceViewModel.class);
-        mLayout = new MutableLiveData<>();
+        mView = new MutableLiveData<>();
         mOnNavigateToListener = defaultOnNavigateToListener();
         mOnSubmitFormListener = defaultOnSubmitFormListener();
         ApiService.create(activity.getApplicationContext());
@@ -37,7 +40,7 @@ public class HalContainer {
     private OnSubmitFormListener defaultOnSubmitFormListener() {
         return (form) -> {
             mViewModel.submitForm(form).observe(mActivity, result -> {
-                mLayout.setValue(getLayout(result));
+                mView.setValue(getView(result));
             });
         };
     }
@@ -58,33 +61,35 @@ public class HalContainer {
         }
     }
 
-    public LiveData<HalLayout> showResource(String uri) {
+    public LiveData<View> showResource(String uri) {
         mViewModel.getResource(uri).observe(mActivity, result -> {
-            mLayout.setValue(getLayout(result));
+            mView.setValue(getView(result));
         });
-        return mLayout;
+        return mView;
     }
 
-    private HalLayout getLayout(ResourceWrapper result) {
+    private View getView(ResourceWrapper result) {
         HalLayout layout;
-        if (result.isSuccessful()) {
-            if (result.isForm()) {
-                FormLayout form = new FormLayout(mActivity, (Form) result.getResource());
-                form.setOnSubmitFormListener(mOnSubmitFormListener);
-                layout = form;
-            } else {
-                layout = new HalLayout(mActivity, result.getResource());
-            }
-        } else {
+        if (!result.isSuccessful()) {
             layout = getErrorLayout(result);
+        } else if (result.isForm()) {
+            layout = getFormLayout(result);
+        } else {
+            layout = new HalLayout(mActivity, result.getResource(), mOnNavigateToListener);
         }
-        layout.setOnNavigateToListener(mOnNavigateToListener);
-        return layout;
+        ScrollView view = new ScrollView(mActivity.getApplicationContext());
+        view.addView(layout);
+        return view;
     }
 
     private HalLayout getErrorLayout(ResourceWrapper result) {
         // FIXME
-        return new HalLayout(mActivity, result.getResource());
+        return new HalLayout(mActivity, result.getResource(), mOnNavigateToListener);
+    }
+
+    private FormLayout getFormLayout(ResourceWrapper result) {
+        FormLayout form = new FormLayout(mActivity, (Form) result.getResource(), mOnNavigateToListener, mOnSubmitFormListener);
+        return form;
     }
 }
 

@@ -36,18 +36,21 @@ public class FormLayout extends HalLayout {
         }
     }
 
-    public FormLayout(Context context, Form form) {
+    public FormLayout(
+            Context context,
+            Form form,
+            HalContainer.OnNavigateToListener navigateToListener,
+            HalContainer.OnSubmitFormListener submitFormListener
+    ) {
         super(context);
         mForm = form;
+        mOnNavigateToListener = navigateToListener;
+        mOnSubmitFormListener = submitFormListener;
         createForm();
     }
 
     public Form getForm() {
         return mForm;
-    }
-
-    public void setOnSubmitFormListener(HalContainer.OnSubmitFormListener listener) {
-        mOnSubmitFormListener = listener;
     }
 
     private void createForm() {
