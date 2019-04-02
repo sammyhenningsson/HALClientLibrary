@@ -13,10 +13,6 @@ public class ResourceViewModel extends ViewModel {
         return repository().getResource(uri);
     }
 
-    public LiveData<FormWrapper> getForm(String uri) {
-        return repository().getForm(uri);
-    }
-
     public LiveData<ResourceWrapper> submitForm(Form form) {
         return repository().submitForm(form);
     }

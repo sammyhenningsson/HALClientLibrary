@@ -38,52 +38,16 @@ public class ResourceRepository {
         apiService().get(uri, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.i(Constants.TAG, response.toString());
-                boolean isForm = false;
-                for (int i = 0; i < headers.length; ++i) {
-                    Header header = headers[i];
-                    if (header.getName().equals("Content-Type")) {
-                        Log.i(Constants.TAG, "Content-Type: " + header.getValue());
-                        isForm = header.getValue().contains("profile=shaf-form");
-                        break;
-                    }
-                }
-                Resource resource;
-                if (isForm) {
-                    resource = new Form(response);
-                } else {
-                    resource = new Resource(response);
-                }
+                Log.i(Constants.TAG, "status: " + statusCode + "\n" + response.toString());
+                Resource resource = parseResource(headers, response);
                 store(resource, headers);
-                ResourceWrapper wrapper = new ResourceWrapper(resource);
-                data.setValue(wrapper);
+                data.setValue(new ResourceWrapper(resource));
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
                 ResourceWrapper wrapper = processFailure(statusCode, headers, response);
                 data.setValue(wrapper);
-            }
-        });
-        return data;
-    }
-
-    public LiveData<FormWrapper> getForm(String uri) {
-        MutableLiveData<FormWrapper> data = new MutableLiveData<>();
-        apiService().get(uri, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.i(Constants.TAG, response.toString());
-                Form form = new Form(response);
-
-                FormWrapper wrapper = new FormWrapper(form);
-                data.setValue(wrapper);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-                ResourceWrapper wrapper = processFailure(statusCode, headers, response);
-                data.setValue(FormWrapper.from(wrapper));
             }
         });
         return data;
@@ -95,11 +59,10 @@ public class ResourceRepository {
         submitForm(form, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.i(Constants.TAG, Integer.toString(statusCode) + ": " + response.toString());
-                Resource resource = new Resource(response);
+                Log.i(Constants.TAG, "status: " + statusCode + "\n" + response.toString());
+                Resource resource = parseResource(headers, response);
                 store(resource, headers);
-                ResourceWrapper wrapper = new ResourceWrapper(resource);
-                data.setValue(wrapper);
+                data.setValue(new ResourceWrapper(resource));
             }
 
             @Override
@@ -130,6 +93,28 @@ public class ResourceRepository {
                 apiService().patch(url, body, contentType, responseHandler);
                 break;
         }
+    }
+
+    private Resource parseResource(Header[] headers, JSONObject response) {
+        if (isForm(headers)) {
+            return new Form(response);
+        } else {
+            return new Resource(response);
+        }
+    }
+
+    private boolean isForm(Header[] headers) {
+        return contentType(headers).contains("profile=shaf-form");
+    }
+
+    private String contentType(Header[] headers) {
+        for (int i = 0; i < headers.length; ++i) {
+            Header header = headers[i];
+            if (header.getName().equals("Content-Type")) {
+                return header.getValue();
+            }
+        }
+        return "";
     }
 
     private ResourceWrapper processFailure(int statusCode, Header[] headers, JSONObject response) {
