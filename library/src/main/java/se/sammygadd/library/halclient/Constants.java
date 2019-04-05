@@ -1,5 +1,5 @@
 package se.sammygadd.library.halclient;
 
 public class Constants {
-    static final String TAG = "HalClient";
+    public static final String TAG = "HalClient";
 }

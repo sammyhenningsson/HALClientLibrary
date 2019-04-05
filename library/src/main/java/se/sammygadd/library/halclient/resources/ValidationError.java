@@ -1,6 +1,4 @@
-package se.sammygadd.library.halclient;
-
-import android.util.Log;
+package se.sammygadd.library.halclient.resources;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,7 +9,7 @@ import java.util.List;
 
 public class ValidationError extends Error {
 
-    class Field {
+    public class Field {
         private String mName;
         private List<String> mMessages;
 

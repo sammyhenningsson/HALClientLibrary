@@ -1,4 +1,4 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.layouts;
 
 import android.content.Context;
 import android.text.Editable;
@@ -10,6 +10,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import se.sammygadd.library.halclient.Constants;
+import se.sammygadd.library.halclient.HalContainer;
+import se.sammygadd.library.halclient.resources.Form;
+import se.sammygadd.library.halclient.resources.ValidationError;
 
 public class FormLayout extends HalLayout {
     private Form mForm;
@@ -117,7 +122,7 @@ public class FormLayout extends HalLayout {
         inputLayout.setHint(field.getLabel());
         inputLayout.setError(getError(field.getName()));
 
-        TextInputEditText input = new TextInputEditText(getContext());
+        TextInputEditText input = new TextInputEditText(inputLayout.getContext());
         input.setLayoutParams(generateDefaultLayoutParams());
         int inputType = getInputType(field.getType());
         input.setInputType(inputType);

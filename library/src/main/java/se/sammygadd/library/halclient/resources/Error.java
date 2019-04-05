@@ -1,6 +1,8 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.resources;
 
 import org.json.JSONObject;
+
+import se.sammygadd.library.halclient.resources.Resource;
 
 public class Error extends Resource {
     public Error(JSONObject json) {

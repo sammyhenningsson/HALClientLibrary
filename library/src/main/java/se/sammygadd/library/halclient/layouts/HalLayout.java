@@ -1,4 +1,4 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.layouts;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import androidx.cardview.widget.CardView;
+import se.sammygadd.library.halclient.Constants;
+import se.sammygadd.library.halclient.HalContainer;
+import se.sammygadd.library.halclient.R;
+import se.sammygadd.library.halclient.resources.Link;
+import se.sammygadd.library.halclient.resources.Resource;
 
 public class HalLayout extends LinearLayout {
     protected final int MARGIN_LEFT = 36;

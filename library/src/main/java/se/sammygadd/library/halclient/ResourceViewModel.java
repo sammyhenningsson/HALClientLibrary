@@ -2,6 +2,7 @@ package se.sammygadd.library.halclient;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+import se.sammygadd.library.halclient.resources.Form;
 
 public class ResourceViewModel extends ViewModel {
 

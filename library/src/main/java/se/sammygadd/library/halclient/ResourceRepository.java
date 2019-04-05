@@ -7,6 +7,11 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.protocol.HTTP;
+import se.sammygadd.library.halclient.resources.Error;
+import se.sammygadd.library.halclient.resources.Form;
+import se.sammygadd.library.halclient.resources.Resource;
+import se.sammygadd.library.halclient.resources.ValidationError;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;

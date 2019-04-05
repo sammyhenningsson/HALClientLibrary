@@ -1,4 +1,4 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.resources;
 
 import android.util.Log;
 import org.json.JSONArray;
@@ -8,11 +8,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.sammygadd.library.halclient.Constants;
+
 public class Form extends Resource {
 
     private final String DEFAULT_SUBMIT_TEXT = "save";
 
-    class Field {
+    public class Field {
         public final static int STRING  = 1;
         public final static int INTEGER = 2;
         public final static int FLOAT   = 3;

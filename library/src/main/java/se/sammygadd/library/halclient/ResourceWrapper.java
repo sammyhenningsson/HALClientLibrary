@@ -1,5 +1,9 @@
 package se.sammygadd.library.halclient;
 
+import se.sammygadd.library.halclient.resources.Form;
+import se.sammygadd.library.halclient.resources.Resource;
+import se.sammygadd.library.halclient.resources.ValidationError;
+
 public class ResourceWrapper {
     private Resource mResource;
     private String mError;

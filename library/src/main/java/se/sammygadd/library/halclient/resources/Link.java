@@ -1,4 +1,4 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.resources;
 
 import org.json.JSONObject;
 

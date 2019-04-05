@@ -1,4 +1,4 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.resources;
 
 import android.util.Log;
 
@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import se.sammygadd.library.halclient.Constants;
 
 public class Resource {
     JSONObject mJSON;

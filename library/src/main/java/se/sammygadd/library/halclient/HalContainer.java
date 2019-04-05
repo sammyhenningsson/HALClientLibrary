@@ -7,6 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProviders;
+import se.sammygadd.library.halclient.resources.Form;
+import se.sammygadd.library.halclient.resources.Resource;
+import se.sammygadd.library.halclient.resources.ValidationError;
+import se.sammygadd.library.halclient.layouts.FormLayout;
+import se.sammygadd.library.halclient.layouts.HalLayout;
 
 public class HalContainer {
 
@@ -82,15 +87,19 @@ public class HalContainer {
         } else if (result.isForm()) {
             layout = getFormLayout(result.getForm());
         } else {
-            layout = new HalLayout(mActivity, result.getResource(), mOnNavigateToListener);
+            layout = getHALLayout((result.getResource()));
         }
         ScrollView view = new ScrollView(mActivity.getApplicationContext());
         view.addView(layout);
         return view;
     }
 
+    private HalLayout getHALLayout(Resource resource) {
+        return new HalLayout(mActivity, resource, mOnNavigateToListener);
+    }
+
     private HalLayout getErrorLayout(Resource resource) {
-        // FIXME
+        // Currently there is no special view for errors
         return new HalLayout(mActivity, resource, mOnNavigateToListener);
     }
 

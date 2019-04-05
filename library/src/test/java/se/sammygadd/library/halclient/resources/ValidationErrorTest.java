@@ -1,19 +1,14 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.resources;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import se.sammygadd.library.halclient.TestHelper;
+import se.sammygadd.library.halclient.resources.ValidationError;
 
 import static org.junit.Assert.*;
 

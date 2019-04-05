@@ -1,4 +1,4 @@
-package se.sammygadd.library.halclient;
+package se.sammygadd.library.halclient.resources;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +10,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import se.sammygadd.library.halclient.TestHelper;
+import se.sammygadd.library.halclient.resources.Curie;
+import se.sammygadd.library.halclient.resources.Link;
+import se.sammygadd.library.halclient.resources.Resource;
 
 import static org.junit.Assert.*;
 
