@@ -1,7 +1,11 @@
 package se.sammygadd.library.halclient;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
@@ -20,6 +24,7 @@ public class HalContainer {
     private MutableLiveData<View> mView;
     private OnNavigateToListener mOnNavigateToListener;
     private OnSubmitFormListener mOnSubmitFormListener;
+    private List<String> mBackStack;
 
     public interface OnNavigateToListener {
         void onNavigateTo(String uri);
@@ -35,6 +40,7 @@ public class HalContainer {
         mView = new MutableLiveData<>();
         mOnNavigateToListener = defaultOnNavigateToListener();
         mOnSubmitFormListener = defaultOnSubmitFormListener();
+        mBackStack = new ArrayList<>();
         ApiService.create(activity.getApplicationContext());
     }
 
@@ -67,10 +73,26 @@ public class HalContainer {
     }
 
     public LiveData<View> showResource(String uri) {
+        mBackStack.add(uri);
         mViewModel.getResource(uri).observe(mActivity, result -> {
             mView.setValue(getView(result));
         });
         return mView;
+    }
+
+    public boolean canGoBack() {
+        return mBackStack.size() > 1;
+    }
+
+    public LiveData<View> goBack() {
+        if (mBackStack.size() > 1) {
+            mBackStack.remove(mBackStack.size() - 1); // remove current
+            String uri = mBackStack.get(mBackStack.size() - 1);
+            mBackStack.remove(mBackStack.size() - 1); // remove last (will be readded in showResource)
+            return showResource(uri);
+        } else {
+            return mView;
+        }
     }
 
     private View getView(ResourceWrapper result) {
