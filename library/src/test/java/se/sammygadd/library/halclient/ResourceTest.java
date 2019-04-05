@@ -5,32 +5,20 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
 public class ResourceTest {
-
-    private String getTestResource(String name) {
-        InputStream is = getClass().getClassLoader().getResourceAsStream(name);
-        if (is == null ) return null;
-        return new BufferedReader(new InputStreamReader(is))
-                .lines().collect(Collectors.joining("\n"));
-    }
-
     Resource post;
 
     @Before
     public void setup() {
-        String str = getTestResource("post.json");
+        String str = TestHelper.getResource(getClass(), "post.json");
         assertNotNull("Failed to load test resource \"post.json\"", str);
         try {
             post = new Resource(new JSONObject(str));

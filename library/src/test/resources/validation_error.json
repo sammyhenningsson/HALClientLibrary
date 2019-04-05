@@ -1,0 +1,9 @@
+{
+  "title": "Invalid entity",
+  "message": "The user could not be saved, due to unfulfilled requirements",
+  "code": "VALIDATION_ERROR",
+  "fields": {
+    "email": ["cannot be empty"],
+    "start_date": ["must have format YYYY-MM-DD", "must be in the future"]
+  }
+}
