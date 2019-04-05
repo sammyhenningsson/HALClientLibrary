@@ -21,6 +21,14 @@ public class ResourceWrapper {
         return mResource;
     }
 
+    public Form getForm() {
+        return isForm() ? (Form) mResource : null;
+    }
+
+    public ValidationError getValidationError() {
+        return isValidationError() ? (ValidationError) mResource : null;
+    }
+
     public String getError() {
         return mError;
     }
@@ -29,7 +37,15 @@ public class ResourceWrapper {
         return mError == null;
     }
 
+    public boolean isFailure() {
+        return !isSuccessful();
+    }
+
     public boolean isForm() {
         return mResource instanceof Form;
+    }
+
+    public boolean isValidationError() {
+        return mResource instanceof ValidationError;
     }
 }

@@ -1,10 +1,11 @@
 package se.sammygadd.library.halclient;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -74,5 +75,34 @@ public class ValidationError extends Error {
             }
         }
         return mFields;
+    }
+
+    public Field getField(String name) {
+        List<Field> fields = getFields();
+        for (int i = 0; i < fields.size(); ++i) {
+            Field field = fields.get(i);
+            if (name.equals(field.getName())) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    public String getMessage(String name) {
+        Field field = getField(name);
+        if (field == null) {
+            return null;
+        } else {
+            return field.getMessage();
+        }
+    }
+
+    public List<String> getMessages(String name) {
+        Field field = getField(name);
+        if (field == null) {
+            return new ArrayList<String>();
+        } else {
+            return field.getMessages();
+        }
     }
 }

@@ -13,6 +13,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class FormLayout extends HalLayout {
     private Form mForm;
+    private ValidationError mValidationError;
     private HalContainer.OnSubmitFormListener mOnSubmitFormListener;
 
     private class InputWatcher implements TextWatcher {
@@ -42,8 +43,19 @@ public class FormLayout extends HalLayout {
             HalContainer.OnNavigateToListener navigateToListener,
             HalContainer.OnSubmitFormListener submitFormListener
     ) {
+        this(context, form, null, navigateToListener, submitFormListener);
+    }
+
+    public FormLayout(
+            Context context,
+            Form form,
+            ValidationError validationError,
+            HalContainer.OnNavigateToListener navigateToListener,
+            HalContainer.OnSubmitFormListener submitFormListener
+    ) {
         super(context);
         mForm = form;
+        mValidationError = validationError;
         mOnNavigateToListener = navigateToListener;
         mOnSubmitFormListener = submitFormListener;
         createForm();
@@ -68,7 +80,9 @@ public class FormLayout extends HalLayout {
 
     private void addFields() {
         for (Form.Field field: mForm.getFields()) {
-            addView(createInput(field));
+            if (!field.isHidden()) {
+                addView(createInput(field));
+            }
         }
     }
 
@@ -82,21 +96,32 @@ public class FormLayout extends HalLayout {
 
     private void submitForm() {
         if (mOnSubmitFormListener != null) {
-            Log.i(Constants.TAG, "calling submit listener..");
+            Log.d(Constants.TAG, "calling submit listener..");
             mOnSubmitFormListener.onSubmitForm(mForm);
         } else {
-            Log.i(Constants.TAG, "har ingen lyssnare..");
+            Log.d(Constants.TAG, "no listener for submitForm");
         }
     }
+
+    private String getError(String name) {
+        if (mValidationError == null) {
+            return null;
+        } else  {
+            return mValidationError.getMessage(name);
+        }
+    }
+
 
     private View createInput(Form.Field field) {
         TextInputLayout inputLayout = new TextInputLayout(getContext());
         inputLayout.setHint(field.getLabel());
+        inputLayout.setError(getError(field.getName()));
 
         TextInputEditText input = new TextInputEditText(getContext());
         input.setLayoutParams(generateDefaultLayoutParams());
         int inputType = getInputType(field.getType());
         input.setInputType(inputType);
+        input.setText(field.getValue());
         input.addTextChangedListener(new InputWatcher(field));
 
         inputLayout.addView(input);

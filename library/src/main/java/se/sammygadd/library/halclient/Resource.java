@@ -32,6 +32,7 @@ public class Resource {
                 if (key.equals("_links") || key.equals("_embedded")) {
                     continue;
                 }
+                // FIXME: How should we handle arrays or hash as attributes?
                 if (mJSON.optJSONObject(key) != null || mJSON.optJSONArray(key) != null) {
                     continue;
                 }
@@ -45,7 +46,10 @@ public class Resource {
         if (mLinks == null) {
             mLinks = new HashMap<>();
             try {
-                JSONObject links = mJSON.getJSONObject("_links");
+                JSONObject links = mJSON.optJSONObject("_links");
+                if (links == null) {
+                    return mLinks;
+                }
                 Iterator<String> keys = links.keys();
                 while (keys.hasNext()) {
                     String rel = keys.next();

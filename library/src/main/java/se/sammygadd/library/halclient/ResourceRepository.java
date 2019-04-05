@@ -77,7 +77,7 @@ public class ResourceRepository {
 
     private void submitForm(Form form, JsonHttpResponseHandler responseHandler) {
         String data = form.getData();
-        Log.i(Constants.TAG, "Submiting form: " + data);
+        Log.d(Constants.TAG, "Submiting form: " + data);
         StringEntity body = new StringEntity(data, HTTP.UTF_8);
         String url = form.getHref();
         String contentType = form.getType();
@@ -98,6 +98,12 @@ public class ResourceRepository {
     private Resource parseResource(Header[] headers, JSONObject response) {
         if (isForm(headers)) {
             return new Form(response);
+        } else if (isError(headers)) {
+            if (isValidationError(response)) {
+                return new ValidationError(response);
+            } else {
+                return new Error(response);
+            }
         } else {
             return new Resource(response);
         }
@@ -105,6 +111,14 @@ public class ResourceRepository {
 
     private boolean isForm(Header[] headers) {
         return contentType(headers).contains("profile=shaf-form");
+    }
+
+    private boolean isError(Header[] headers) {
+        return contentType(headers).contains("profile=shaf-error");
+    }
+
+    private boolean isValidationError(JSONObject response) {
+        return !response.isNull("fields");
     }
 
     private String contentType(Header[] headers) {
@@ -119,7 +133,7 @@ public class ResourceRepository {
 
     private ResourceWrapper processFailure(int statusCode, Header[] headers, JSONObject response) {
         Log.e(Constants.TAG,Integer.toString(statusCode) + ": " + response.toString());
-        Resource error = new Resource(response);
+        Resource error = parseResource(headers, response);
         String msg = error.getAttribute("title", "Request failed with status: " + statusCode);
         return new ResourceWrapper(error, msg);
     }

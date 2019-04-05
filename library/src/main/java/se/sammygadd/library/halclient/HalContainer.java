@@ -40,7 +40,7 @@ public class HalContainer {
     private OnSubmitFormListener defaultOnSubmitFormListener() {
         return (form) -> {
             mViewModel.submitForm(form).observe(mActivity, result -> {
-                mView.setValue(getView(result));
+                mView.setValue(getView(result, form));
             });
         };
     }
@@ -69,11 +69,18 @@ public class HalContainer {
     }
 
     private View getView(ResourceWrapper result) {
+        return getView(result, null);
+    }
+
+    private View getView(ResourceWrapper result, Form form) {
         HalLayout layout;
-        if (!result.isSuccessful()) {
-            layout = getErrorLayout(result);
+
+        if (form != null && result.isValidationError()) {
+            layout = getFormLayout(form, result.getValidationError());
+        } else if (result.isFailure()) {
+            layout = getErrorLayout(result.getResource());
         } else if (result.isForm()) {
-            layout = getFormLayout(result);
+            layout = getFormLayout(result.getForm());
         } else {
             layout = new HalLayout(mActivity, result.getResource(), mOnNavigateToListener);
         }
@@ -82,14 +89,17 @@ public class HalContainer {
         return view;
     }
 
-    private HalLayout getErrorLayout(ResourceWrapper result) {
+    private HalLayout getErrorLayout(Resource resource) {
         // FIXME
-        return new HalLayout(mActivity, result.getResource(), mOnNavigateToListener);
+        return new HalLayout(mActivity, resource, mOnNavigateToListener);
     }
 
-    private FormLayout getFormLayout(ResourceWrapper result) {
-        FormLayout form = new FormLayout(mActivity, (Form) result.getResource(), mOnNavigateToListener, mOnSubmitFormListener);
-        return form;
+    private FormLayout getFormLayout(Form form) {
+        return new FormLayout(mActivity, form, mOnNavigateToListener, mOnSubmitFormListener);
+    }
+
+    private FormLayout getFormLayout(Form form, ValidationError validationError) {
+        return new FormLayout(mActivity, form, validationError, mOnNavigateToListener, mOnSubmitFormListener);
     }
 }
 

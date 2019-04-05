@@ -24,6 +24,7 @@ public class Form extends Resource {
         private String mValue;
         private Boolean mRequired;
         private String mSubmit;
+        private Boolean mHidden;
 
         public Field(JSONObject json) {
             setType(json.optString("type"));
@@ -31,6 +32,7 @@ public class Form extends Resource {
             mLabel = json.optString("label", mName);
             mValue = json.optString("value");
             mRequired = json.optBoolean("required", false);
+            mHidden = json.optBoolean("hidden", false);
         }
 
         private void setType(String type) {
@@ -74,6 +76,10 @@ public class Form extends Resource {
 
         public boolean isRequired() {
             return mRequired;
+        }
+
+        public boolean isHidden() {
+            return mHidden;
         }
     }
 
@@ -127,6 +133,10 @@ public class Form extends Resource {
         if (mFields == null) {
             mFields = new ArrayList<>();
             JSONArray list = mJSON.optJSONArray("fields");
+            if (list == null) {
+                return mFields;
+            }
+
             for (int i = 0; i < list.length(); i++) {
                 try {
                     Field field = new Field(list.getJSONObject(i));
