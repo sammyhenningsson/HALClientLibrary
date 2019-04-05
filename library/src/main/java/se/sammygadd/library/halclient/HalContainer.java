@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProviders;
+import se.sammygadd.library.halclient.resources.Error;
 import se.sammygadd.library.halclient.resources.Form;
 import se.sammygadd.library.halclient.resources.Resource;
 import se.sammygadd.library.halclient.resources.ValidationError;
@@ -102,10 +103,16 @@ public class HalContainer {
     private View getView(ResourceWrapper result, Form form) {
         HalLayout layout;
 
+        if (result == null) {
+            // FIXME: How to handle this? 
+            // Perhaps we should pass in the uri and send out an intent to
+            // open the uri in browser instead???)
+        }
+
         if (form != null && result.isValidationError()) {
             layout = getFormLayout(form, result.getValidationError());
-        } else if (result.isFailure()) {
-            layout = getErrorLayout(result.getResource());
+        } else if (result.isError()) {
+            layout = getErrorLayout(result.getError());
         } else if (result.isForm()) {
             layout = getFormLayout(result.getForm());
         } else {
@@ -120,9 +127,9 @@ public class HalContainer {
         return new HalLayout(mActivity, resource, mOnNavigateToListener);
     }
 
-    private HalLayout getErrorLayout(Resource resource) {
+    private HalLayout getErrorLayout(Error error) {
         // Currently there is no special view for errors
-        return new HalLayout(mActivity, resource, mOnNavigateToListener);
+        return new HalLayout(mActivity, error, mOnNavigateToListener);
     }
 
     private FormLayout getFormLayout(Form form) {

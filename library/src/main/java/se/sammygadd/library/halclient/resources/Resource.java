@@ -154,7 +154,8 @@ public class Resource {
 
     public String toString() {
         try {
-            return mJSON.toString(2);
+            int indentSpaces = 2;
+            return mJSON.toString(indentSpaces);
         } catch (JSONException e) {
             return mJSON.toString();
         }
