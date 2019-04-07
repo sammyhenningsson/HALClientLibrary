@@ -1,0 +1,30 @@
+{
+  "method": "POST",
+  "name": "create-post",
+  "title": "Create Post",
+  "href": "http://localhost:3000/posts",
+  "type": "application/json",
+  "submit": "save",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "tags",
+      "type": "string",
+      "hidden": true
+    }
+  ],
+  "_links": {
+    "profile": {
+      "href": "https://gist.githubusercontent.com/sammyhenningsson/39c8aafeaf60192b082762cbf3e08d57/raw/shaf-form.md",
+      "templated": false
+    },
+    "self": {
+      "href": "http://localhost:3000/post/form",
+      "templated": false
+    }
+  }
+}

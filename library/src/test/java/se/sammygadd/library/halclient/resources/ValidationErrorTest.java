@@ -17,18 +17,11 @@ public class ValidationErrorTest {
 
     @Before
     public void setup() {
-        String str = TestHelper.getResource(getClass(), "validation_error.json");
-        assertNotNull("Failed to load test resource \"validation_error.json\"", str);
-        try {
-            validationError = new ValidationError(new JSONObject(str));
-        } catch (JSONException e) {
-            System.out.println("Caught json exception: " + e.getMessage());
-        }
-        assertNotNull("Could not parse test resource \"validation_error.json\"", validationError);
+        validationError = TestHelper.getValidationErrorResource(getClass(), "validation_error.json");
     }
 
     @Test
-    public void validationError_contructor() throws JSONException {
+    public void error_toString() {
         assertNotNull(validationError.toString());
     }
 

@@ -1,7 +1,5 @@
 package se.sammygadd.library.halclient.resources;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,9 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import se.sammygadd.library.halclient.TestHelper;
-import se.sammygadd.library.halclient.resources.Curie;
-import se.sammygadd.library.halclient.resources.Link;
-import se.sammygadd.library.halclient.resources.Resource;
 
 import static org.junit.Assert.*;
 
@@ -23,19 +18,7 @@ public class ResourceTest {
 
     @Before
     public void setup() {
-        String str = TestHelper.getResource(getClass(), "post.json");
-        assertNotNull("Failed to load test resource \"post.json\"", str);
-        try {
-            post = new Resource(new JSONObject(str));
-        } catch (JSONException e) {
-            System.out.println("Caught json exception: " + e.getMessage());
-        }
-        assertNotNull("Could not parse test resource \"post.json\"", post);
-    }
-
-    @Test
-    public void resource_contructor() throws JSONException {
-        assertNotNull(post.toString());
+        post = TestHelper.getResource(getClass(), "post.json");
     }
 
     @Test
