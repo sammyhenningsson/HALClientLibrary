@@ -9,13 +9,9 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.protocol.HTTP;
 import se.sammygadd.library.halclient.resources.Form;
 import se.sammygadd.library.halclient.resources.Resource;
-
-import org.json.JSONObject;
-
 import java.util.HashMap;
 
 public class ResourceRepository {
-    private MutableLiveData<Form> mRegistrationForm;
     private HashMap<String, Resource> mStorage;
 
     private static ResourceRepository mRepository;
@@ -28,7 +24,6 @@ public class ResourceRepository {
     }
 
     public ResourceRepository() {
-        mRegistrationForm = new MutableLiveData<>();
         mStorage = new HashMap<>();
     }
 
@@ -49,8 +44,10 @@ public class ResourceRepository {
     }
 
     private HalResponseHandler getResponseHandler(MutableLiveData<ResourceWrapper> data) {
-        return new HalResponseHandler(data, (resource, headers) -> {
-            store(resource, headers);
+        return new HalResponseHandler(data, (result, headers) -> {
+            if (!result.isArray() && !result.isError()) {
+                store(result.getResource(), headers);
+            }
         });
     }
 

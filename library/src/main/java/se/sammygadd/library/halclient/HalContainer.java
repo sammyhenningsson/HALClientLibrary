@@ -1,6 +1,5 @@
 package se.sammygadd.library.halclient;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 
