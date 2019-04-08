@@ -8,7 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import androidx.lifecycle.MutableLiveData;
 import cz.msebera.android.httpclient.Header;
@@ -18,30 +21,26 @@ import se.sammygadd.library.halclient.resources.Resource;
 import se.sammygadd.library.halclient.resources.ValidationError;
 
 public class HalResponseHandler extends JsonHttpResponseHandler {
-    public interface SuccessCallback {
-        void onSuccess(ResourceWrapper result, Header[] headers);
-    }
-
     private MutableLiveData<ResourceWrapper>  mData;
-    private SuccessCallback mCallback;
+    private Storage mStorage;
+    private Pattern mMaxAgePattern;
 
-    public HalResponseHandler(MutableLiveData<ResourceWrapper> data, SuccessCallback callback) {
+    public HalResponseHandler(MutableLiveData<ResourceWrapper> data, Storage storage) {
         super();
         mData = data;
-        mCallback = callback;
+        mStorage = storage;
+        mMaxAgePattern = Pattern.compile(".*max-age=(\\d+).*");
     }
 
     @Override
     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
         ResourceWrapper result = processResponse(statusCode, headers, response);
-        mCallback.onSuccess(result, headers);
         mData.setValue(result);
     }
 
     @Override
     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
         ResourceWrapper result = processResponse(statusCode, headers, response);
-        mCallback.onSuccess(result, headers);
         mData.setValue(result);
     }
 
@@ -54,7 +53,8 @@ public class HalResponseHandler extends JsonHttpResponseHandler {
 
     @Override
     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-        processFailure(statusCode, headers, response);
+        ResourceWrapper result = processFailure(statusCode, headers, response);
+        mData.setValue(result);
     }
 
     @Override
@@ -74,20 +74,35 @@ public class HalResponseHandler extends JsonHttpResponseHandler {
     private ResourceWrapper processResponse(int statusCode, Header[] headers, JSONObject response) {
         Log.i(Constants.TAG, "status: " + statusCode);
         Resource resource = parseResource(headers, response);
-        return new ResourceWrapper(resource);
+        ResourceWrapper result = new ResourceWrapper(resource);
+
+        addCacheInfo(resource, headers);
+        store(result, headers);
+
+        return result;
     }
 
     private ResourceWrapper processResponse(int statusCode, Header[] headers, JSONArray response) {
         Log.i(Constants.TAG, "status: " + statusCode);
         List<Resource> resources = parseResources(headers, response);
         return new ResourceWrapper(resources);
-
     }
 
-    private void processFailure(int statusCode, Header[] headers, JSONObject response) {
-        Log.w(Constants.TAG, "request failed with status: " + statusCode);
-        Resource error = parseResource(headers, response);
-        mData.setValue(new ResourceWrapper(error));
+    private ResourceWrapper processFailure(int statusCode, Header[] headers, JSONObject response) {
+        if (statusCode == 304) {
+            Log.d(Constants.TAG, "Resource has not been modifed. Use cached version!");
+            Resource resource = getCached(headers);
+            ResourceWrapper result = new ResourceWrapper(resource);
+
+            addCacheInfo(resource, headers);
+            store(result, headers);
+
+            return result;
+        } else {
+            Log.w(Constants.TAG, "Request failed with status: " + statusCode);
+            Resource error = parseResource(headers, response);
+            return new ResourceWrapper(error);
+        }
     }
 
     private Resource parseResource(Header[] headers, JSONObject response) {
@@ -113,7 +128,7 @@ public class HalResponseHandler extends JsonHttpResponseHandler {
             return null;
         }
 
-        Log.d(Constants.TAG, "response: " + resource.toString());
+        Log.d(Constants.TAG, "Response: " + resource.toString());
         return resource;
     }
 
@@ -146,13 +161,67 @@ public class HalResponseHandler extends JsonHttpResponseHandler {
         return !response.isNull("fields");
     }
 
+    private void addCacheInfo(Resource resource, Header[] headers) {
+        if (resource != null && !isError(headers)) {
+            String etag = getEtag(headers);
+            resource.setEtag(etag);
+
+            Date expireAt = getExpireAt(headers);
+            resource.setExpiration(expireAt);
+        } else if (resource == null) {
+            Log.d(Constants.TAG, "Resource is null!");
+        } else {
+            Log.d(Constants.TAG, "Resource is error!");
+        }
+    }
+
     private String contentType(Header[] headers) {
+        return getHeader(headers, "Content-Type", "");
+    }
+
+    private String getEtag(Header[] headers) {
+        return getHeader(headers, "ETag");
+    }
+
+    private Date getExpireAt(Header[] headers) {
+        String cacheControl = getHeader(headers, "Cache-Control", "");
+        Matcher matcher = mMaxAgePattern.matcher(cacheControl);
+        if (!matcher.matches()) {
+            return null;
+        }
+        String maxAge = matcher.group(1);
+        Long seconds = Long.parseLong(maxAge);
+        Date now = new Date();
+
+        return new Date(now.getTime() + seconds * 1000);
+    }
+
+    private String getHeader(Header[] headers, String name) {
+        return getHeader(headers, name, null);
+    }
+
+    private String getHeader(Header[] headers, String name, String defaultValue) {
         for (int i = 0; i < headers.length; ++i) {
             Header header = headers[i];
-            if (header.getName().equals("Content-Type")) {
+            if (header.getName().equals(name)) {
                 return header.getValue();
             }
         }
-        return "";
+        return defaultValue;
+    }
+
+    // FIXME add Authorization header to key
+    private Resource getCached(Header[] headers) {
+        String uri = getRequestURI().toString();
+        if (!mStorage.hasResource(uri)) {
+            return null;
+        }
+        return mStorage.get(uri).getResource();
+    }
+
+    // FIXME add Authorization header to key
+    private void store(ResourceWrapper wrapper, Header[] headers) {
+        String uri = getRequestURI().toString();
+        mStorage.put(uri, wrapper);
     }
 }

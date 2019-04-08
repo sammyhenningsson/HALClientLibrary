@@ -7,7 +7,8 @@ import se.sammygadd.library.halclient.resources.Form;
 public class ResourceViewModel extends ViewModel {
 
     private ResourceRepository repository() {
-        return ResourceRepository.get();
+        Storage storage = new InMemoryStorage();
+        return ResourceRepository.get(storage);
     }
 
     public LiveData<ResourceWrapper> getResource(String uri) {

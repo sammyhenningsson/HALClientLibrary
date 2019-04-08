@@ -41,6 +41,13 @@ public class ResourceWrapper {
         return isValidationError() ? (ValidationError) mResource : null;
     }
 
+    public boolean isResource() {
+        if (mResource == null) {
+            return false;
+        }
+        return !isArray() && !isError();
+    }
+
     public boolean isArray() {
         return !mResources.isEmpty();
     }

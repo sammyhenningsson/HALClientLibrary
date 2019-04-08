@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +16,9 @@ import java.util.Set;
 import se.sammygadd.library.halclient.Constants;
 
 public class Resource {
+    String mEtag;
+    Date mExpireAt;
+
     JSONObject mJSON;
     HashMap<String,String> mAttributes;
     HashMap<String, Link> mLinks;
@@ -23,6 +27,26 @@ public class Resource {
 
     public Resource(JSONObject json) {
         mJSON = json;
+    }
+
+    public String getEtag() {
+        return mEtag;
+    }
+
+    public void setEtag(String etag) {
+        mEtag = etag;
+    }
+
+    public boolean isStale() {
+        if (mExpireAt == null) {
+            return true;
+        }
+        Date now = new Date();
+        return mExpireAt.before(now);
+    }
+
+    public void setExpiration(Date expireAt) {
+        mExpireAt = expireAt;
     }
 
     public HashMap<String, String> getAttributes() {
@@ -80,7 +104,6 @@ public class Resource {
             } catch (JSONException e) {
                 System.out.println("Failed to parse curie: " + curies.toString());
             }
-
         }
     }
 
@@ -93,7 +116,7 @@ public class Resource {
 
     public HashMap<String, List<Resource>> getEmbedded() {
         if (mEmbedded == null) {
-            mEmbedded = new HashMap<String, List<Resource>>();
+            mEmbedded = new HashMap<>();
             try {
                 JSONObject embedded = mJSON.optJSONObject("_embedded");
                 if (embedded == null) return mEmbedded;
