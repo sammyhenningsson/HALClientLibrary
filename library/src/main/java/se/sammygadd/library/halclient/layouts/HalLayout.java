@@ -105,12 +105,12 @@ public class HalLayout extends LinearLayout {
         return mResource;
     }
 
-    protected void navigateTo(String href) {
+    protected void navigateTo(String rel, String href) {
         if (mOnNavigateToListener != null) {
             Log.i(Constants.TAG, "navigera till: " + href);
-            mOnNavigateToListener.onNavigateTo(href);
+            mOnNavigateToListener.onNavigateTo(rel, href);
         } else {
-            Log.i(Constants.TAG, "har ingen lyssnare..");
+            Log.d(Constants.TAG, "Button was clicked but it has no OnNavigateToListener");
         }
     }
 
@@ -147,7 +147,7 @@ public class HalLayout extends LinearLayout {
                     continue;
                 }
             }
-            addButton(card, title, link.href());
+            addButton(card, title, link.rel(), link.href());
         }
     }
 
@@ -193,7 +193,7 @@ public class HalLayout extends LinearLayout {
         return new ColorDrawable(DIVIDER_COLOR);
     }
 
-    protected void addButton(ViewGroup card, String title, String href) {
+    protected void addButton(ViewGroup card, String title, String rel, String href) {
         LayoutParams params = generateDefaultLayoutParams();
         params.setMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM);
 
@@ -202,7 +202,7 @@ public class HalLayout extends LinearLayout {
         button.setText(title);
         button.setTextColor(getPrimaryColor());
         button.setBackgroundColor(BUTTON_BACKGROUND_COLOR);
-        button.setOnClickListener(btn -> navigateTo(href));
+        button.setOnClickListener(btn -> navigateTo(rel, href));
 
         card.addView(button);
     }
